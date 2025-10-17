@@ -1,0 +1,21 @@
+{
+  "family": "flask-ecs-demo",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "arn:aws:iam::341162387305:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "flask-ecs-demo",
+      "image": "341162387305.dkr.ecr.us-east-1.amazonaws.com/flask-ecs-demo:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 5000,
+          "protocol": "tcp"
+        }
+      ]
+    }
+  ]
+}
