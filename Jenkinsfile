@@ -2,8 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
-        AWS_CREDS = credentials('aws-credentials')
+        DOCKERHUB_CREDENTIALS = credentials('docker-s-creds')
         IMAGE_NAME = "suchandra12/flask-api"
         TASK_DEF_FILE = "task-definition.json"
         CLUSTER_NAME = "flask-ecs-cluster"
@@ -25,7 +24,10 @@ pipeline {
 
         stage('Login to Docker Hub') {
             steps {
-                sh "echo ${DOCKERHUB_CREDENTIALS_PSW} | docker login -u ${DOCKERHUB_CREDENTIALS_USR} --password-stdin"
+                sh """
+                echo ${DOCKERHUB_CREDENTIALS_PSW} | \
+                docker login -u ${DOCKERHUB_CREDENTIALS_USR} --password-stdin
+                """
             }
         }
 
@@ -37,7 +39,7 @@ pipeline {
 
         stage('Register ECS Task Definition') {
             steps {
-                withAWS(credentials: 'aws-ecs-credentials', region: 'us-east-1') {
+                withAWS(credentials: 'aws-credentials', region: 'us-east-1') {
                     sh "aws ecs register-task-definition --cli-input-json file://${TASK_DEF_FILE}"
                 }
             }
@@ -45,7 +47,7 @@ pipeline {
 
         stage('Deploy to ECS') {
             steps {
-                withAWS(credentials: 'aws-ecs-credentials', region: 'us-east-1') {
+                withAWS(credentials: 'aws-credentials', region: 'us-east-1') {
                     sh """
                     aws ecs update-service \
                       --cluster ${CLUSTER_NAME} \
